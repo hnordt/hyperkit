@@ -35,7 +35,9 @@
           const nextState = reducer(currentState, action);
           store.text = JSON.stringify(nextState, null, 2);
 
-          Array.from(document.querySelectorAll("[selectorfor]"))
+          Array.from(
+            document.querySelectorAll(`[selectorfor="${store.id}"]`),
+          )
             .forEach(
               (element) => {
                 element.textContent =
