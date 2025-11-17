@@ -23,14 +23,17 @@
 
     <section>
       <h1>Attribute selector</h1>
-      <el-observer for="store" sync="value:count aria-valuenow:count">
-        <input
-          type="number"
-          value="0"
-          aria-valuenow="0"
-          readonly
-        />
-      </el-observer>
+      <label>
+        Count:
+        <el-observer for="store" sync="value:count aria-valuenow:count">
+          <input
+            type="number"
+            value="0"
+            aria-valuenow="0"
+            readonly
+          />
+        </el-observer>
+      </label>
     </section>
 
     <section>
