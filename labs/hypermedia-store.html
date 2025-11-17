@@ -15,7 +15,9 @@
     <section>
       <h1>Default selector</h1>
       <p>
-        Count: <output selectorfor="store" selector="count">0</output>
+        <el-observer for="store" sync="count">
+          Count: <output>0</output>
+        </el-observer>
       </p>
       <div role="toolbar">
         <button commandfor="store" command="--increment" data-by="1">
@@ -31,23 +33,44 @@
 
     <section>
       <h1>Attribute selector</h1>
-      <input
-        type="number"
-        selectorfor="store"
-        selector="value:count aria-valuenow:count"
-        value="0"
-        aria-valuenow="0"
-        readonly
-      />
-      <!--
-        Alternative API:
-        <el-observer for="store" sync="value:count">
-         <input type="number" value="0" />
-        </el-observer>
-      -->
+
+      <el-observer for="store" sync="value:count">
+        <input
+          type="number"
+          value="0"
+          aria-valuenow="0"
+          readonly
+        />
+      </el-observer>
     </section>
 
     <script>
+      customElements.define(
+        "el-observer",
+        class extends HTMLElement {
+          connectedCallback() {
+            document.getElementById(this.getAttribute("for"))
+              .addEventListener("storeupdate", (event) => {
+                const { nextState } = event.detail;
+                const parts = this.getAttribute("sync").split(" ");
+
+                for (const part of parts) {
+                  if (part.includes(":")) {
+                    const [attr, selector] = part.split(":");
+                    this.firstElementChild.setAttribute(
+                      attr,
+                      nextState[selector],
+                    );
+                  } else {
+                    this.firstElementChild.textContent =
+                      nextState[part];
+                  }
+                }
+              });
+          }
+        },
+      );
+
       document.getElementById("store").addEventListener(
         "command",
         (event) => {
@@ -64,23 +87,14 @@
           const nextState = reducer(currentState, action);
           store.text = JSON.stringify(nextState, null, 2);
 
-          const listeners = Array.from(
-            document.querySelectorAll(`[selectorfor="${store.id}"]`),
+          store.dispatchEvent(
+            new CustomEvent("storeupdate", {
+              detail: {
+                currentState,
+                nextState,
+              },
+            }),
           );
-
-          for (const listener of listeners) {
-            const selector = listener.getAttribute("selector");
-            const parts = selector.split(" ");
-
-            for (const part of parts) {
-              if (part.includes(":")) {
-                const [attr, selector] = part.split(":");
-                listener.setAttribute(attr, nextState[selector]);
-              } else {
-                listener.textContent = nextState[selector];
-              }
-            }
-          }
         },
       );
 
