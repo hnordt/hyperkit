@@ -19,22 +19,11 @@
           Count: <output>0</output>
         </el-observer>
       </p>
-      <div role="toolbar">
-        <button commandfor="store" command="--increment" data-by="1">
-          Increment by 1
-        </button>
-        <button commandfor="store" command="--increment" data-by="5">
-          Increment by 5
-        </button>
-      </div>
     </section>
-
-    <hr />
 
     <section>
       <h1>Attribute selector</h1>
-
-      <el-observer for="store" sync="value:count">
+      <el-observer for="store" sync="value:count aria-valuenow:count">
         <input
           type="number"
           value="0"
@@ -42,6 +31,24 @@
           readonly
         />
       </el-observer>
+    </section>
+
+    <section>
+      <h1>Actions</h1>
+      <div role="toolbar">
+        <button commandfor="store" command="--increment" data-by="1">
+          Increment by 1
+        </button>
+        <button commandfor="store" command="--increment" data-by="-1">
+          Decrement by 1
+        </button>
+        <button commandfor="store" command="--increment" data-by="5">
+          Increment by 5
+        </button>
+        <button commandfor="store" command="--increment" data-by="-5">
+          Decrement by 5
+        </button>
+      </div>
     </section>
 
     <script>
