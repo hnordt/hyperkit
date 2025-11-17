@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+  </head>
+
+  <body>
+    <script id="store" type="application/json">
+      {
+        "count": 0
+      }
+    </script>
+
+    <p selectorfor="store" selector="count">0</p>
+
+    <button commandfor="store" command="--increment" data-by="5">
+      Increment
+    </button>
+
+    <script>
+      document.getElementById("store").addEventListener(
+        "command",
+        (event) => {
+          const store = event.target;
+
+          const currentState = JSON.parse(store.text);
+
+          const payload = event.source.dataset;
+          const action = {
+            ...payload,
+            type: event.command,
+          };
+
+          const nextState = reducer(currentState, action);
+          store.text = JSON.stringify(nextState, null, 2);
+
+          Array.from(document.querySelectorAll("[selectorfor]"))
+            .forEach(
+              (element) => {
+                element.textContent =
+                  nextState[element.getAttribute("selector")];
+              },
+            );
+        },
+      );
+
+      function reducer(state, action) {
+        switch (action.type) {
+          case "--increment": {
+            return {
+              ...state,
+              count: state.count + Number(action.by),
+            };
+          }
+          default: {
+            return state;
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
