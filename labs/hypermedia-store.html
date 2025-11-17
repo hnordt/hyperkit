@@ -12,11 +12,34 @@
       }
     </script>
 
-    <p selectorfor="store" selector="count">0</p>
+    <section>
+      <h1>Default selector</h1>
+      <p>
+        Count: <output selectorfor="store" selector="count">0</output>
+      </p>
+      <div role="toolbar">
+        <button commandfor="store" command="--increment" data-by="1">
+          Increment by 1
+        </button>
+        <button commandfor="store" command="--increment" data-by="5">
+          Increment by 5
+        </button>
+      </div>
+    </section>
 
-    <button commandfor="store" command="--increment" data-by="5">
-      Increment
-    </button>
+    <hr />
+
+    <section>
+      <h1>Attribute selector</h1>
+      <input
+        type="number"
+        selectorfor="store"
+        selector="value:count aria-valuenow:count"
+        value="0"
+        aria-valuenow="0"
+        readonly
+      />
+    </section>
 
     <script>
       document.getElementById("store").addEventListener(
@@ -35,15 +58,23 @@
           const nextState = reducer(currentState, action);
           store.text = JSON.stringify(nextState, null, 2);
 
-          Array.from(
+          const listeners = Array.from(
             document.querySelectorAll(`[selectorfor="${store.id}"]`),
-          )
-            .forEach(
-              (element) => {
-                element.textContent =
-                  nextState[element.getAttribute("selector")];
-              },
-            );
+          );
+
+          for (const listener of listeners) {
+            const selector = listener.getAttribute("selector");
+            const parts = selector.split(" ");
+
+            for (const part of parts) {
+              if (part.includes(":")) {
+                const [attr, selector] = part.split(":");
+                listener.setAttribute(attr, nextState[selector]);
+              } else {
+                listener.textContent = nextState[selector];
+              }
+            }
+          }
         },
       );
 
